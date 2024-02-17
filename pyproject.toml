@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "cryptographic-protection-methods"
+version = "0.1.0"
+description = ""
+authors = ["coolworld2049 <coolworld2049@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26.4"
+pandas = "^2.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
