@@ -1,43 +1,20 @@
 import flet as ft
 from loguru import logger
 
-from replacement_method.replacement_method.algorithm import (
+from algorithm import (
     TrithemiusCipher,
     TrithemiusCipherException,
 )
 
 
-def app_bar(page: ft.Page):
-    page.theme_mode = ft.ThemeMode.DARK
-    page.window_width = 600
-    page.window_height = 800
-
-    def theme_changed(e):
-        if page.theme_mode == ft.ThemeMode.LIGHT:
-            page.theme_mode = ft.ThemeMode.DARK
-            theme_switch.thumb_icon = ft.icons.DARK_MODE
-        elif page.theme_mode == ft.ThemeMode.DARK:
-            page.theme_mode = ft.ThemeMode.LIGHT
-            theme_switch.thumb_icon = ft.icons.SUNNY
-        page.update()
-
-    theme_switch = ft.Switch(thumb_icon=ft.icons.SUNNY, on_change=theme_changed)
-
-    page.appbar = ft.AppBar(
-        bgcolor=ft.colors.SURFACE_VARIANT,
-        actions=[
-            theme_switch,
-        ],
-    )
-
-
 def main(page: ft.Page):
-    app_bar(page)
-
+    page.theme_mode = ft.ThemeMode.SYSTEM
+    page.window_width = 600
     page.title = "Trithemius Cipher"
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.vertical_alignment = ft.MainAxisAlignment.SPACE_BETWEEN
+
     alphabet_default = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
-    keyword_defualt = "секретный ключ"
+    keyword_defualt = "ключ"
     shift_defualt = 1
     page.trithemius_cipher = TrithemiusCipher(
         alphabet=alphabet_default, keyword=keyword_defualt, shift=1
@@ -49,11 +26,13 @@ def main(page: ft.Page):
 
     def update_trithemius_cipher_instance(e):
         page.trithemius_cipher = TrithemiusCipher(
-            alphabet=alphabet_tb.value, keyword=key_tb.value, shift=int(shift_tb.value)
+            alphabet=alphabet_tb.value,
+            keyword=keyword_tb.value,
+            shift=int(shift_tb.value),
         )
-        logger.info(page.trithemius_cipher)
+        logger.info(f"Initialize {page.trithemius_cipher}")
 
-    def message_on_focus(e):
+    def on_change_message(e):
         update_trithemius_cipher_instance(e)
         try:
             encrypted_tb.value = page.trithemius_cipher.encrypt(message_tb.value)
@@ -66,40 +45,38 @@ def main(page: ft.Page):
         page.update()
 
     alphabet_tb = ft.TextField(
-        label="Alphabet", value=alphabet_default, on_change=message_on_focus
+        label="alphabet", value=alphabet_default, on_change=on_change_message
     )
-    key_tb = ft.TextField(
-        label="Key", value=keyword_defualt, on_change=message_on_focus
+    keyword_tb = ft.TextField(
+        label="key", value=keyword_defualt, on_change=on_change_message
     )
-    shift_tb = ft.TextField(label="Shift", value=str(shift_defualt))
+    shift_tb = ft.TextField(label="shift", value=str(shift_defualt))
 
     message_tb = ft.TextField(
         label="Message",
         multiline=True,
-        text_size=20,
-        on_change=message_on_focus,
+        hint_text="Enter message to encrypt",
+        on_change=on_change_message,
     )
     encrypted_tb = ft.TextField(
         label="Encrypted",
         read_only=True,
         multiline=True,
-        text_size=20,
     )
     decrypted_tb = ft.TextField(
         label="Decrypted",
         read_only=True,
         multiline=True,
-        text_size=20,
     )
 
     def shift_slider_changed(e):
         shift_tb.value = e.control.value
-        message_on_focus(e)
+        on_change_message(e)
         page.update()
 
     page.add(
         alphabet_tb,
-        key_tb,
+        keyword_tb,
         shift_tb,
         ft.Slider(
             min=0,
@@ -108,11 +85,11 @@ def main(page: ft.Page):
             divisions=len(page.trithemius_cipher.trithemius_table),
             on_change=shift_slider_changed,
         ),
-        ft.Divider(),
         message_tb,
         encrypted_tb,
         decrypted_tb,
     )
 
 
-ft.app(target=main)
+if __name__ == "__main__":
+    ft.app(target=main)

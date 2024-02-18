@@ -38,7 +38,7 @@ class TrithemiusCipher:
 
     def __generate_table(self):
         return [
-            list(self._square_string[i: i + 6])
+            list(self._square_string[i : i + 6])
             for i in range(0, len(self._square_string), 6)
         ]
 
@@ -81,7 +81,7 @@ class TrithemiusCipher:
         return self.__process_message(ciphertext, -self._shift)
 
 
-def test_trithemius_cipher():
+def main():
     alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
     keyword = "секретный ключ"
     plaintext = (
@@ -99,4 +99,4 @@ def test_trithemius_cipher():
 
 
 if __name__ == "__main__":
-    test_trithemius_cipher()
+    main()
