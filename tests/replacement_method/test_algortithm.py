@@ -1,6 +1,6 @@
 from loguru import logger
 
-from src.replacement_method.app import TrithemiusCipher
+from src.replacement_method.algorithm import TrithemiusCipher
 
 
 def test_trithemius_cipher():

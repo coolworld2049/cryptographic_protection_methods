@@ -6,10 +6,9 @@ authors = ["coolworld2049 <coolworld2049@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
+python = "^3.11"
 loguru = "^0.7.2"
 flet = "^0.20.2"
-pyinstaller = "^6.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
