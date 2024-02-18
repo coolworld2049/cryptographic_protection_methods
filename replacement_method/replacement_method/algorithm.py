@@ -3,6 +3,10 @@ import string
 from loguru import logger
 
 
+class TrithemiusCipherException(Exception):
+    pass
+
+
 class TrithemiusCipher:
     def __init__(self, alphabet: str, keyword: str, shift: int = 1):
         self._alphabet = alphabet.lower()
@@ -21,13 +25,21 @@ class TrithemiusCipher:
 
         self.trithemius_table = self.__generate_table()
         assert (
-            1 <= self._shift <= len(self.trithemius_table)
-        ), f"shift must be ge 1 and le {len(self.trithemius_table)}"
+            0 <= self._shift <= len(self.trithemius_table)
+        ), f"shift must be ge 0 and le {len(self.trithemius_table)}"
+
+    def __repr__(self):
+        return (
+            f"TrithemiusCipher"
+            f"(alphabet={self._alphabet}, "
+            f"keyword={self._keyword}, "
+            f"shift={self._shift})"
+        )
 
     def __generate_table(self):
         return [
-            list(self._square_string[i : i + 6])
-            for i in range(0, len(self._square_string), 6)
+            list(self._square_string[i : i + 5])
+            for i in range(0, len(self._square_string), 5)
         ]
 
     def __find_position(self, char):
@@ -40,9 +52,10 @@ class TrithemiusCipher:
     def __update_position(self, row, col, shift):
         return (row + shift) % len(self.trithemius_table), col
 
-    def __process_text(self, text, shift):
+    def __process_message(self, message: str, shift: int):
+        message = message.lower().replace("\n", "").replace("\t", "")
         processed_text = ""
-        for char in text:
+        for char in message:
             if char == " ":
                 processed_text += char
                 continue
@@ -55,10 +68,17 @@ class TrithemiusCipher:
         return processed_text
 
     def encrypt(self, plaintext):
-        return self.__process_text(plaintext.lower(), self._shift)
+        is_message_in__square_string = list(
+            map(lambda c: c in self._alphabet, list(plaintext))
+        )
+        if not all(is_message_in__square_string):
+            raise TrithemiusCipherException(
+                "Encrypt: Input symbol is not part of the alphabet"
+            )
+        return self.__process_message(plaintext, self._shift)
 
     def decrypt(self, ciphertext):
-        return self.__process_text(ciphertext.lower(), -self._shift)
+        return self.__process_message(ciphertext, -self._shift)
 
 
 def test_trithemius_cipher():
