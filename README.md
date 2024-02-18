@@ -3,13 +3,6 @@
 ## Installing dependencies
 
 ```bash
-poetry export --without-hashes --format=requirements.txt > requirements.txt
-pip install -r requirements.txt
-```
-
-OR
-
-```bash
 poetry install
 ```
 
