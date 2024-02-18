@@ -20,7 +20,7 @@ class TrithemiusCipher:
             sorted(set(self._alphabet) - set(self._unique_keyword))
         )
         self._square_string = (
-            self._unique_keyword + self._remaining_chars + string.punctuation
+            self._unique_keyword + self._remaining_chars + string.punctuation + " "
         )
 
         self.trithemius_table = self.__generate_table()
@@ -38,8 +38,8 @@ class TrithemiusCipher:
 
     def __generate_table(self):
         return [
-            list(self._square_string[i : i + 5])
-            for i in range(0, len(self._square_string), 5)
+            list(self._square_string[i: i + 6])
+            for i in range(0, len(self._square_string), 6)
         ]
 
     def __find_position(self, char):
@@ -69,7 +69,7 @@ class TrithemiusCipher:
 
     def encrypt(self, plaintext):
         is_message_in__square_string = list(
-            map(lambda c: c in self._alphabet, list(plaintext))
+            map(lambda c: c.lower() in self._square_string, list(plaintext))
         )
         if not all(is_message_in__square_string):
             raise TrithemiusCipherException(
