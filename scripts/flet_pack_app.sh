@@ -2,6 +2,5 @@
 
 cd ../src/replacement_method
 . ../../scripts/pyproject_to_requirements.sh
-echo "algorithm" >> requirements.txt
-flet pack app.py -D -y
+flet pack app.py -n trithemius_cipher -y
 cd ../../scripts
