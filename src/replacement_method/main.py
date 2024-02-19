@@ -1,54 +1,75 @@
 import flet as ft
 from loguru import logger
 
-from replacement_method.algorithm import TrithemiusCipherException, TrithemiusCipher
+from replacement_method.algorithm import TrithemiusCipher, TrithemiusCipherException
 
 
 def main(page: ft.Page):
-    page.theme_mode = ft.ThemeMode.SYSTEM
-    page.window_width = 600
     page.title = "Trithemius Cipher"
+    page.window_width = 800
     page.vertical_alignment = ft.MainAxisAlignment.SPACE_BETWEEN
-
-    alphabet_default = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
-    keyword_defualt = "ключ"
-    shift_defualt = 1
-    page.trithemius_cipher = TrithemiusCipher(
-        alphabet=alphabet_default, keyword=keyword_defualt, shift=1
-    )
+    page.trithemius_cipher = TrithemiusCipher()
     trithemius_cipher_error_t = ft.Text()
     trithemius_cipher_error_dlg = ft.AlertDialog(
         title=trithemius_cipher_error_t, bgcolor=ft.colors.ON_ERROR
     )
+    page.window_center()
 
-    def update_trithemius_cipher_instance(e):
+    def on_change_message(e):
         page.trithemius_cipher = TrithemiusCipher(
-            alphabet=alphabet_tb.value,
+            lang=language_dd.value,
             keyword=keyword_tb.value,
             shift=int(shift_tb.value),
         )
         logger.info(f"Initialize {page.trithemius_cipher}")
-
-    def on_change_message(e):
-        update_trithemius_cipher_instance(e)
         try:
             encrypted_tb.value = page.trithemius_cipher.encrypt(message_tb.value)
             decrypted_tb.value = page.trithemius_cipher.decrypt(encrypted_tb.value)
-        except TrithemiusCipherException as e:
-            logger.error(e)
-            trithemius_cipher_error_t.value = " ".join(e.args)
+        except* (AssertionError, TrithemiusCipherException) as e:
+            logger.error(e.exceptions)
+            trithemius_cipher_error_t.value = "\n".join(
+                [" ".join(x.args) for x in e.exceptions]
+            )
             page.dialog = trithemius_cipher_error_dlg
             trithemius_cipher_error_dlg.open = True
         page.update()
 
-    alphabet_tb = ft.TextField(
-        label="alphabet", value=alphabet_default, on_change=on_change_message
-    )
-    keyword_tb = ft.TextField(
-        label="key", value=keyword_defualt, on_change=on_change_message
-    )
-    shift_tb = ft.TextField(label="shift", value=str(shift_defualt))
+    def on_change_language_dd(e):
+        language_dd.value = e.control.value
+        keyword_tb.value = None
+        shift_tb.value = 1
+        shift_slider.value = 1
+        message_tb.value = None
+        encrypted_tb.value = None
+        decrypted_tb.value = None
+        page.update()
+        on_change_message(e)
 
+    language_dd = ft.Dropdown(
+        width=100,
+        options=[
+            ft.dropdown.Option("ru"),
+            ft.dropdown.Option("en"),
+        ],
+        value=page.trithemius_cipher.lang,
+        on_change=on_change_language_dd,
+    )
+
+    keyword_tb = ft.TextField(label="key", on_change=on_change_message)
+    shift_tb = ft.TextField(label="shift", value=str(1))
+
+    def shift_slider_changed(e):
+        shift_tb.value = e.control.value
+        on_change_message(e)
+        page.update()
+
+    shift_slider = ft.Slider(
+        min=0,
+        value=1,
+        max=len(page.trithemius_cipher.table) - 1,
+        divisions=len(page.trithemius_cipher.table) - 1,
+        on_change=shift_slider_changed,
+    )
     message_tb = ft.TextField(
         label="Message",
         multiline=True,
@@ -66,22 +87,16 @@ def main(page: ft.Page):
         multiline=True,
     )
 
-    def shift_slider_changed(e):
-        shift_tb.value = e.control.value
-        on_change_message(e)
-        page.update()
-
     page.add(
-        alphabet_tb,
+        ft.Row(
+            controls=[
+                ft.Text("Language"),
+                language_dd,
+            ]
+        ),
         keyword_tb,
         shift_tb,
-        ft.Slider(
-            min=0,
-            value=1,
-            max=len(page.trithemius_cipher.trithemius_table),
-            divisions=len(page.trithemius_cipher.trithemius_table),
-            on_change=shift_slider_changed,
-        ),
+        shift_slider,
         message_tb,
         encrypted_tb,
         decrypted_tb,
@@ -89,4 +104,4 @@ def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    ft.app(main)
