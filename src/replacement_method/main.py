@@ -54,8 +54,12 @@ def main(page: ft.Page):
         value=page.trithemius_cipher.lang,
         on_change=on_change_language_dd,
     )
-    use_punctiation_c = ft.Checkbox(label="Punctiation", value=True)
-    use_numbers_c = ft.Checkbox(label="Numbers", value=True)
+    use_punctiation_c = ft.Checkbox(
+        label="Punctiation", value=True, on_change=on_change_message
+    )
+    use_numbers_c = ft.Checkbox(
+        label="Numbers", value=True, on_change=on_change_message
+    )
     keyword_tb = ft.TextField(label="key", on_change=on_change_message)
     shift_tb = ft.TextField(label="shift", value=str(1))
 
@@ -93,13 +97,17 @@ def main(page: ft.Page):
             controls=[
                 ft.Text("Language"),
                 language_dd,
-                use_punctiation_c,
-                use_numbers_c,
             ]
         ),
         keyword_tb,
         shift_tb,
         shift_slider,
+        ft.Row(
+            controls=[
+                use_punctiation_c,
+                use_numbers_c,
+            ]
+        ),
         message_tb,
         encrypted_tb,
         decrypted_tb,

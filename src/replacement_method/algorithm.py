@@ -1,3 +1,4 @@
+import pprint
 import string
 from typing import Literal
 
@@ -34,14 +35,19 @@ class TrithemiusCipher:
         """
         self.lang = lang
 
-        self.__keyword = keyword.lower().replace(" ", "")
-        assert self.is_symbols_in_alphabet(
-            text=self.__keyword, alphabet=self.ALPHABETS[self.lang]
+        self.__keyword = keyword.lower()
+        assert (
+            self.is_symbols_in_alphabet(
+                text=self.__keyword, alphabet=self.ALPHABETS[self.lang]
+            )[0]
+            is True
         ), f"symbol not exist in {self.lang} alphabet"
 
         self.__shift = shift
-        self.__row_length = 6
+        self.__use_punctiation = use_punctiation
+        self.__use_numbers = use_numbers
 
+        self.__row_length = 6
         self.__unique_keyword = "".join(
             sorted(set(self.__keyword), key=self.__keyword.index)
         )
@@ -49,15 +55,18 @@ class TrithemiusCipher:
             sorted(set(self.ALPHABETS[self.lang]) - set(self.__unique_keyword))
         )
 
-        self.__alphabet = (
-            self.__unique_keyword + self.__remaining_chars + self.PUNCTUATION
-            if use_punctiation
-            else "" + self.NUMBERS if use_numbers else ""
-        )
+        self.__alphabet = self.__unique_keyword + self.__remaining_chars
+
+        if use_punctiation:
+            self.__alphabet += self.PUNCTUATION
+        if use_numbers:
+            self.__alphabet += self.NUMBERS
 
         self.trithemius_alphabet_table = self.__generate_trithemius_table()
-
-        if len(self.trithemius_alphabet_table[-1]) < self.__row_length:
+        if (
+            len(self.trithemius_alphabet_table) > 0
+            and len(self.trithemius_alphabet_table[-1]) < self.__row_length
+        ):
             self.trithemius_alphabet_table[-1].extend(
                 [
                     " "
@@ -66,7 +75,10 @@ class TrithemiusCipher:
                     )
                 ]
             )
-
+        trithemius_alphabet_table_string = pprint.pformat(
+            self.trithemius_alphabet_table, indent=2
+        )
+        logger.info(f"trithemius_alphabet_table:\n{trithemius_alphabet_table_string}")
         assert (
             0 <= self.__shift < len(self.trithemius_alphabet_table)
         ), f"shift must be ge 0 and lt {len(self.trithemius_alphabet_table)}"
@@ -76,7 +88,9 @@ class TrithemiusCipher:
             f"TrithemiusCipher"
             f"(lang={self.lang}, "
             f"keyword={self.__keyword}, "
-            f"shift={self.__shift})"
+            f"shift={self.__shift}, "
+            f"use_punctiation={self.__use_punctiation}, "
+            f"use_numbers={self.__use_numbers})"
         )
 
     @staticmethod
@@ -88,12 +102,6 @@ class TrithemiusCipher:
 
         :param text: str | list[str]: Текст или список символов для проверки.
         :param alphabet: str | list[str]: Алфавит, в котором проверяются символы.
-
-        :return: tuple[bool, str] | tuple[bool]: Кортеж.
-
-        - Если все символы принадлежат алфавиту, возвращается (True,).
-
-        - Если хотя бы один символ не принадлежит алфавиту, возвращается (False, символ).
         """
         for symbol in text:
             if symbol.lower() not in alphabet:
@@ -139,7 +147,9 @@ class TrithemiusCipher:
         """
         return (row + shift) % len(self.trithemius_alphabet_table), col
 
-    def __process_message(self, message: str, shift: int):
+    def __process_message(
+        self, message: str, shift: int, action: Literal["encrypt", "decrypt"]
+    ):
         """
         Обрабатывает сообщение для шифрования или дешифрования.
 
@@ -158,7 +168,7 @@ class TrithemiusCipher:
             new_row, new_col = self.__update_position(row, col, shift)
             processed_text += self.trithemius_alphabet_table[new_row][new_col]
             logger.debug(
-                f"'{char}'[{row}, {col}] -> '{self.trithemius_alphabet_table[new_row][new_col]}' [{new_row}, {new_col}]"
+                f"{action} '{char}'[{row}, {col}] -> '{self.trithemius_alphabet_table[new_row][new_col]}' [{new_row}, {new_col}]"
             )
         return processed_text
 
@@ -177,7 +187,7 @@ class TrithemiusCipher:
             raise Exception(
                 f"symbol '{check_result[1]}' not exist in {self.lang} alphabet"
             )
-        return self.__process_message(plaintext, self.__shift)
+        return self.__process_message(plaintext, self.__shift, "encrypt")
 
     def decrypt(self, ciphertext):
         """
@@ -187,4 +197,4 @@ class TrithemiusCipher:
 
         :return: str: Расшифрованный текст.
         """
-        return self.__process_message(ciphertext, -self.__shift)
+        return self.__process_message(ciphertext, -self.__shift, "decrypt")
