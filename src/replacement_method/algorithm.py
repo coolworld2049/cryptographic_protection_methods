@@ -24,8 +24,7 @@ class TrithemiusCipher:
         keyword: str = "",
         shift: int = 1,
         use_punctiation: bool = True,
-        use_numbers: bool = True,
-    ):
+        use_numbers: bool = True,):
         """
         :param lang: Literal["ru", "en"] | str: Язык алфавита (русский или английский).
         :param keyword: str: Ключевое слово для шифрования.
