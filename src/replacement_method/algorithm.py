@@ -36,23 +36,25 @@ class TrithemiusCipher:
         self.lang = lang
 
         self.__keyword = keyword.lower()
-        assert (
-            self.is_symbols_in_alphabet(
-                text=self.__keyword, alphabet=self.ALPHABETS[self.lang]
-            )[0]
-            is True
-        ), f"symbol not exist in {self.lang} alphabet"
-
         self.__shift = shift
         self.__use_punctiation = use_punctiation
         self.__use_numbers = use_numbers
+
+        self.__default_alphabet = self.ALPHABETS[self.lang]
+        assert (
+            self.is_symbols_in_alphabet(
+                text=self.__keyword, alphabet=self.__default_alphabet
+            )[0]
+            is True
+        ), f"symbol not exist in {self.lang} alphabet"
 
         self.__row_length = 6
         self.__unique_keyword = "".join(
             sorted(set(self.__keyword), key=self.__keyword.index)
         )
+
         self.__remaining_chars = "".join(
-            sorted(set(self.ALPHABETS[self.lang]) - set(self.__unique_keyword))
+            sorted(set(self.__default_alphabet) - set(self.__unique_keyword))
         )
 
         self.__alphabet = self.__unique_keyword + self.__remaining_chars
@@ -69,7 +71,7 @@ class TrithemiusCipher:
         ):
             self.trithemius_alphabet_table[-1].extend(
                 [
-                    " "
+                    ""
                     for _ in range(
                         self.__row_length - len(self.trithemius_alphabet_table[-1])
                     )
