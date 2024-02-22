@@ -11,7 +11,8 @@ poetry install
 ### [Часть I. Метод замены](src%2Freplacement_method)
 
 ```bash
-python src/replacement_method/main.py 
+pip install -r requirements.txt
+python src/replacement_method/main.py
 ```
 
 ### [Часть II. permutation_method](src%2Fpermutation_method)

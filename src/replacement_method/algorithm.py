@@ -65,7 +65,7 @@ class TrithemiusCipher:
 
     def __generate_table(self):
         return [
-            list(self.trithemius_alphabet[i : i + self.__shape])
+            list(self.trithemius_alphabet[i: i + self.__shape])
             for i in range(0, len(self.trithemius_alphabet), self.__shape)
         ]
 
