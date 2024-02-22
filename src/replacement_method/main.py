@@ -1,7 +1,7 @@
 import flet as ft
 from loguru import logger
 
-from replacement_method.algorithm import TrithemiusCipher, TrithemiusCipherException
+from replacement_method.algorithm import TrithemiusCipher
 
 
 def main(page: ft.Page):
@@ -16,20 +16,20 @@ def main(page: ft.Page):
     page.window_center()
 
     def on_change_message(e):
-        page.trithemius_cipher = TrithemiusCipher(
-            lang=language_dd.value,
-            keyword=keyword_tb.value,
-            shift=int(shift_tb.value),
-        )
-        logger.info(f"Initialize {page.trithemius_cipher}")
         try:
+            page.trithemius_cipher = TrithemiusCipher(
+                lang=language_dd.value,
+                keyword=keyword_tb.value,
+                shift=int(shift_tb.value),
+                use_punctiation=use_punctiation_c.value,
+                use_numbers=use_numbers_c.value,
+            )
+            logger.info(f"Initialize {page.trithemius_cipher}")
             encrypted_tb.value = page.trithemius_cipher.encrypt(message_tb.value)
             decrypted_tb.value = page.trithemius_cipher.decrypt(encrypted_tb.value)
-        except* (AssertionError, TrithemiusCipherException) as e:
-            logger.error(e.exceptions)
-            trithemius_cipher_error_t.value = "\n".join(
-                [" ".join(x.args) for x in e.exceptions]
-            )
+        except Exception as e:
+            logger.error(e)
+            trithemius_cipher_error_t.value = "\n".join(e.args)
             page.dialog = trithemius_cipher_error_dlg
             trithemius_cipher_error_dlg.open = True
         page.update()
@@ -54,7 +54,8 @@ def main(page: ft.Page):
         value=page.trithemius_cipher.lang,
         on_change=on_change_language_dd,
     )
-
+    use_punctiation_c = ft.Checkbox(label="Punctiation", value=True)
+    use_numbers_c = ft.Checkbox(label="Numbers", value=True)
     keyword_tb = ft.TextField(label="key", on_change=on_change_message)
     shift_tb = ft.TextField(label="shift", value=str(1))
 
@@ -66,8 +67,8 @@ def main(page: ft.Page):
     shift_slider = ft.Slider(
         min=0,
         value=1,
-        max=len(page.trithemius_cipher.table) - 1,
-        divisions=len(page.trithemius_cipher.table) - 1,
+        max=len(page.trithemius_cipher.trithemius_alphabet_table) - 2,
+        divisions=len(page.trithemius_cipher.trithemius_alphabet_table) - 2,
         on_change=shift_slider_changed,
     )
     message_tb = ft.TextField(
@@ -92,6 +93,8 @@ def main(page: ft.Page):
             controls=[
                 ft.Text("Language"),
                 language_dd,
+                use_punctiation_c,
+                use_numbers_c,
             ]
         ),
         keyword_tb,
