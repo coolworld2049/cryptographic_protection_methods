@@ -25,6 +25,13 @@ class TrithemiusCipher:
         use_punctiation: bool = True,
         use_numbers: bool = True,
     ):
+        """
+        :param lang: Literal["ru", "en"] | str: Язык алфавита (русский или английский).
+        :param keyword: str: Ключевое слово для шифрования.
+        :param shift: int: Сдвиг для шифрования.
+        :param use_punctiation: bool: Флаг использования знаков препинания.
+        :param use_numbers: bool: Флаг использования цифр.
+        """
         self.lang = lang
 
         self.__keyword = keyword.lower().replace(" ", "")
@@ -55,8 +62,8 @@ class TrithemiusCipher:
                 [
                     " "
                     for _ in range(
-                    self.__row_length - len(self.trithemius_alphabet_table[-1])
-                )
+                        self.__row_length - len(self.trithemius_alphabet_table[-1])
+                    )
                 ]
             )
 
@@ -76,18 +83,44 @@ class TrithemiusCipher:
     def is_symbols_in_alphabet(
         text: str | list[str], alphabet: str | list[str]
     ) -> tuple[bool, str] | tuple[bool]:
+        """
+        Проверяет, принадлежат ли символы текста алфавиту.
+
+        :param text: str | list[str]: Текст или список символов для проверки.
+        :param alphabet: str | list[str]: Алфавит, в котором проверяются символы.
+
+        :return: tuple[bool, str] | tuple[bool]: Кортеж.
+
+        - Если все символы принадлежат алфавиту, возвращается (True,).
+
+        - Если хотя бы один символ не принадлежит алфавиту, возвращается (False, символ).
+        """
         for symbol in text:
             if symbol.lower() not in alphabet:
                 return False, symbol
         return (True,)
 
     def __generate_trithemius_table(self):
+        """
+        Генерирует таблицу Тритемия на основе алфавита.
+
+        :return: list[list[str]]
+        """
         return [
-            list(self.__alphabet[i: i + self.__row_length])
+            list(self.__alphabet[i : i + self.__row_length])
             for i in range(0, len(self.__alphabet), self.__row_length)
         ]
 
     def __find_position(self, char):
+        """
+        Находит позицию символа в таблице Тритемия.
+
+        :param char: str: Символ для поиска.
+
+        :return: tuple[int, int] | None: Кортеж (row, col) - координаты символа в таблице.
+
+        Если символ не найден, возвращается None.
+        """
         for row, row_chars in enumerate(self.trithemius_alphabet_table):
             if char in row_chars:
                 col = row_chars.index(char)
@@ -95,9 +128,26 @@ class TrithemiusCipher:
         return None
 
     def __update_position(self, row, col, shift):
+        """
+        Обновляет позицию символа в таблице Тритемия с учетом сдвига.
+
+        :param row: int: Начальная строка символа.
+        :param col: int: Начальный столбец символа.
+        :param shift: int: Сдвиг.
+
+        :return: tuple[int, int]: Кортеж (new_row, new_col) - новые координаты символа.
+        """
         return (row + shift) % len(self.trithemius_alphabet_table), col
 
     def __process_message(self, message: str, shift: int):
+        """
+        Обрабатывает сообщение для шифрования или дешифрования.
+
+        :param message: str: Сообщение для обработки.
+        :param shift: int: Сдвиг для шифрования или дешифрования.
+
+        :return: str: Обработанное сообщение.
+        """
         message = message.lower().replace("\n", "").replace("\t", "")
         processed_text = ""
         for char in message:
@@ -113,10 +163,28 @@ class TrithemiusCipher:
         return processed_text
 
     def encrypt(self, plaintext):
-        check_result = self.is_symbols_in_alphabet(text=plaintext, alphabet=self.__alphabet)
+        """
+        Шифрует переданный текст методом Тритемия.
+
+        :param plaintext: str: Текст для шифрования.
+
+        :return: str: Зашифрованный текст.
+        """
+        check_result = self.is_symbols_in_alphabet(
+            text=plaintext, alphabet=self.__alphabet
+        )
         if not check_result[0]:
-            raise Exception(f"symbol '{check_result[1]}' not exist in {self.lang} alphabet")
+            raise Exception(
+                f"symbol '{check_result[1]}' not exist in {self.lang} alphabet"
+            )
         return self.__process_message(plaintext, self.__shift)
 
     def decrypt(self, ciphertext):
+        """
+        Дешифрует переданный зашифрованный текст методом Тритемия.
+
+        :param ciphertext: str: Зашифрованный текст.
+
+        :return: str: Расшифрованный текст.
+        """
         return self.__process_message(ciphertext, -self.__shift)
