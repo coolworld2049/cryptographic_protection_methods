@@ -15,18 +15,18 @@ def substitution_cipher_controls(
 
     def on_change(e):
         try:
-            page.trisemus_cipher = TrisemusSubstitutionCipher(
+            page.cipher = TrisemusSubstitutionCipher(
                 lang=language_dd.value,
                 keyword=keyword_tb.value,
                 shift=int(shift_slider.value),
                 use_punctiation=use_punctiation_c.value,
                 use_numbers=use_numbers_c.value,
             )
-            shift_slider.max = len(page.trisemus_cipher.trisemus_alphabet_table) - 2
+            shift_slider.max = len(page.cipher.trisemus_alphabet_table) - 2
             shift_slider.divisions = shift_slider.max
-            logger.info(f"Initialize {page.trisemus_cipher}")
-            encrypted_tb.value = page.trisemus_cipher.encrypt(message_tb.value)
-            decrypted_tb.value = page.trisemus_cipher.decrypt(encrypted_tb.value)
+            logger.info(page.cipher)
+            encrypted_tb.value = page.cipher.encrypt(message_tb.value)
+            decrypted_tb.value = page.cipher.decrypt(encrypted_tb.value)
         except Exception as e:
             logger.error(e)
             error_t.value = "\n".join(e.args)

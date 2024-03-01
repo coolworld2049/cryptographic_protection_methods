@@ -15,7 +15,7 @@ def transposition_cipher_controls(
         page.cipher = TranspositionCipher(
             block_size=int(block_size_slider.value),
         )
-        logger.info(f"Initialize {page.cipher}")
+        logger.info(page.cipher)
         try:
             encrypted_tx.value = page.cipher.encrypt(message_tx.value)
             decrypted_tx.value = page.cipher.decrypt(encrypted_tx.value)

@@ -78,7 +78,7 @@ class TrisemusSubstitutionCipher(AbstractCipher):
         trisemus_alphabet_table_string = pprint.pformat(
             self.trisemus_alphabet_table, indent=2
         )
-        logger.info(f"trisemus_alphabet_table:\n{trisemus_alphabet_table_string}")
+        logger.debug(f"trisemus_alphabet_table:\n{trisemus_alphabet_table_string}")
         assert (
             0 <= self.__shift < len(self.trisemus_alphabet_table)
         ), f"shift must be ge 0 and lt {len(self.trisemus_alphabet_table)}"
