@@ -10,9 +10,9 @@ def trisemus_replacement_cipher_controls(
     page: ft.Page,
 ) -> list[typing.Type["ft.Control"]]:
     page.trisemus_cipher = TrisemusCipher()
-    Trisemus_cipher_error_t = ft.Text()
-    Trisemus_cipher_error_dlg = ft.AlertDialog(
-        title=Trisemus_cipher_error_t, bgcolor=ft.colors.ON_ERROR
+    trisemus_cipher_error_t = ft.Text()
+    trisemus_cipher_error_dlg = ft.AlertDialog(
+        title=trisemus_cipher_error_t, bgcolor=ft.colors.ON_ERROR
     )
 
     def on_change_message(e):
@@ -29,9 +29,9 @@ def trisemus_replacement_cipher_controls(
             decrypted_tb.value = page.Trisemus_cipher.decrypt(encrypted_tb.value)
         except Exception as e:
             logger.error(e)
-            Trisemus_cipher_error_t.value = "\n".join(e.args)
-            page.dialog = Trisemus_cipher_error_dlg
-            Trisemus_cipher_error_dlg.open = True
+            trisemus_cipher_error_t.value = "\n".join(e.args)
+            page.dialog = trisemus_cipher_error_dlg
+            trisemus_cipher_error_dlg.open = True
         page.update()
 
     def on_change_language_dd(e):
