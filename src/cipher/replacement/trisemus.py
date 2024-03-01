@@ -4,12 +4,14 @@ from typing import Literal
 
 from loguru import logger
 
+from src.cipher.abstract_cipher import AbstractCipher
 
-class TrithemiusCipherException(Exception):
+
+class TrisemusCipherException(Exception):
     pass
 
 
-class TrithemiusCipher:
+class TrisemusCipher(AbstractCipher):
     ALPHABETS = {
         "ru": "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
         "en": "abcdefghijklmnopqrstuvwxyz",
@@ -24,7 +26,8 @@ class TrithemiusCipher:
         keyword: str = "",
         shift: int = 1,
         use_punctiation: bool = True,
-        use_numbers: bool = True,):
+        use_numbers: bool = True,
+    ):
         """
         :param lang: Literal["ru", "en"] | str: Язык алфавита (русский или английский).
         :param keyword: str: Ключевое слово для шифрования.
@@ -63,30 +66,30 @@ class TrithemiusCipher:
         if use_numbers:
             self.__alphabet += self.NUMBERS
 
-        self.trithemius_alphabet_table = self.__generate_trithemius_table()
+        self.Trisemus_alphabet_table = self.__generate_trisemus_table()
         if (
-            len(self.trithemius_alphabet_table) > 0
-            and len(self.trithemius_alphabet_table[-1]) < self.__row_length
+            len(self.Trisemus_alphabet_table) > 0
+            and len(self.Trisemus_alphabet_table[-1]) < self.__row_length
         ):
-            self.trithemius_alphabet_table[-1].extend(
+            self.Trisemus_alphabet_table[-1].extend(
                 [
                     ""
                     for _ in range(
-                        self.__row_length - len(self.trithemius_alphabet_table[-1])
+                        self.__row_length - len(self.Trisemus_alphabet_table[-1])
                     )
                 ]
             )
-        trithemius_alphabet_table_string = pprint.pformat(
-            self.trithemius_alphabet_table, indent=2
+        Trisemus_alphabet_table_string = pprint.pformat(
+            self.Trisemus_alphabet_table, indent=2
         )
-        logger.info(f"trithemius_alphabet_table:\n{trithemius_alphabet_table_string}")
+        logger.info(f"Trisemus_alphabet_table:\n{Trisemus_alphabet_table_string}")
         assert (
-            0 <= self.__shift < len(self.trithemius_alphabet_table)
-        ), f"shift must be ge 0 and lt {len(self.trithemius_alphabet_table)}"
+            0 <= self.__shift < len(self.Trisemus_alphabet_table)
+        ), f"shift must be ge 0 and lt {len(self.Trisemus_alphabet_table)}"
 
     def __repr__(self):
         return (
-            f"TrithemiusCipher"
+            f"TrisemusCipher"
             f"(lang={self.lang}, "
             f"keyword={self.__keyword}, "
             f"shift={self.__shift}, "
@@ -109,7 +112,7 @@ class TrithemiusCipher:
                 return False, symbol
         return (True,)
 
-    def __generate_trithemius_table(self):
+    def __generate_trisemus_table(self):
         """
         Генерирует таблицу Тритемия на основе алфавита.
 
@@ -130,7 +133,7 @@ class TrithemiusCipher:
 
         Если символ не найден, возвращается None.
         """
-        for row, row_chars in enumerate(self.trithemius_alphabet_table):
+        for row, row_chars in enumerate(self.Trisemus_alphabet_table):
             if char in row_chars:
                 col = row_chars.index(char)
                 return row, col
@@ -146,7 +149,7 @@ class TrithemiusCipher:
 
         :return: tuple[int, int]: Кортеж (new_row, new_col) - новые координаты символа.
         """
-        return (row + shift) % len(self.trithemius_alphabet_table), col
+        return (row + shift) % len(self.Trisemus_alphabet_table), col
 
     def __process_message(
         self, message: str, shift: int, action: Literal["encrypt", "decrypt"]
@@ -167,9 +170,9 @@ class TrithemiusCipher:
                 continue
             row, col = self.__find_position(char)
             new_row, new_col = self.__update_position(row, col, shift)
-            processed_text += self.trithemius_alphabet_table[new_row][new_col]
+            processed_text += self.Trisemus_alphabet_table[new_row][new_col]
             logger.debug(
-                f"{action} '{char}'[{row}, {col}] -> '{self.trithemius_alphabet_table[new_row][new_col]}' [{new_row}, {new_col}]"
+                f"{action} '{char}'[{row}, {col}] -> '{self.Trisemus_alphabet_table[new_row][new_col]}' [{new_row}, {new_col}]"
             )
         return processed_text
 

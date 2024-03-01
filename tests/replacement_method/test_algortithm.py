@@ -1,10 +1,10 @@
+import sys
 from typing import Literal
 
 import pytest
-import sys
 from loguru import logger
 
-from src.replacement_method.algorithm import TrithemiusCipher
+from src.cipher.replacement.trisemus import TrisemusCipher
 
 logger.remove()
 logger.add(sys.stderr, level="INFO")
@@ -24,12 +24,12 @@ TEXT = {
 
 
 @pytest.mark.parametrize("lang,keyword", [("ru", "ключ"), ("en", "key")])
-def test_trithemius_cipher(lang: Literal["ru", "en"], keyword: str):
+def test_trisemus_cipher(lang: Literal["ru", "en"], keyword: str):
     plaintext = TEXT[lang]
-    trithemius_cipher = TrithemiusCipher(lang=lang, keyword=keyword)
-    encrypted_text = trithemius_cipher.encrypt(plaintext)
-    decrypted_text = trithemius_cipher.decrypt(encrypted_text)
-    logger.info(trithemius_cipher)
+    trisemus_cipher = TrisemusCipher(lang=lang, keyword=keyword)
+    encrypted_text = trisemus_cipher.encrypt(plaintext)
+    decrypted_text = trisemus_cipher.decrypt(encrypted_text)
+    logger.info(trisemus_cipher)
     logger.info(f"Origin Text:\n\n{plaintext}\n")
     logger.info(f"Encrypted Text:\n\n{encrypted_text}\n")
     logger.info(f"Decrypted Text:\n\n{decrypted_text}\n")

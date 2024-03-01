@@ -1,37 +1,37 @@
+import typing
+
 import flet as ft
 from loguru import logger
 
-from replacement_method.algorithm import TrithemiusCipher
+from cipher.replacement.trisemus import TrisemusCipher
 
 
-def main(page: ft.Page):
-    page.title = "Trithemius Cipher"
-    page.window_width = 800
-    page.vertical_alignment = ft.MainAxisAlignment.SPACE_BETWEEN
-    page.trithemius_cipher = TrithemiusCipher()
-    trithemius_cipher_error_t = ft.Text()
-    trithemius_cipher_error_dlg = ft.AlertDialog(
-        title=trithemius_cipher_error_t, bgcolor=ft.colors.ON_ERROR
+def trisemus_replacement_cipher_controls(
+    page: ft.Page,
+) -> list[typing.Type["ft.Control"]]:
+    page.trisemus_cipher = TrisemusCipher()
+    Trisemus_cipher_error_t = ft.Text()
+    Trisemus_cipher_error_dlg = ft.AlertDialog(
+        title=Trisemus_cipher_error_t, bgcolor=ft.colors.ON_ERROR
     )
-    page.window_center()
 
     def on_change_message(e):
         try:
-            page.trithemius_cipher = TrithemiusCipher(
+            page.Trisemus_cipher = TrisemusCipher(
                 lang=language_dd.value,
                 keyword=keyword_tb.value,
                 shift=int(shift_tb.value),
                 use_punctiation=use_punctiation_c.value,
                 use_numbers=use_numbers_c.value,
             )
-            logger.info(f"Initialize {page.trithemius_cipher}")
-            encrypted_tb.value = page.trithemius_cipher.encrypt(message_tb.value)
-            decrypted_tb.value = page.trithemius_cipher.decrypt(encrypted_tb.value)
+            logger.info(f"Initialize {page.Trisemus_cipher}")
+            encrypted_tb.value = page.Trisemus_cipher.encrypt(message_tb.value)
+            decrypted_tb.value = page.Trisemus_cipher.decrypt(encrypted_tb.value)
         except Exception as e:
             logger.error(e)
-            trithemius_cipher_error_t.value = "\n".join(e.args)
-            page.dialog = trithemius_cipher_error_dlg
-            trithemius_cipher_error_dlg.open = True
+            Trisemus_cipher_error_t.value = "\n".join(e.args)
+            page.dialog = Trisemus_cipher_error_dlg
+            Trisemus_cipher_error_dlg.open = True
         page.update()
 
     def on_change_language_dd(e):
@@ -51,7 +51,7 @@ def main(page: ft.Page):
             ft.dropdown.Option("ru"),
             ft.dropdown.Option("en"),
         ],
-        value=page.trithemius_cipher.lang,
+        value=page.trisemus_cipher.lang,
         on_change=on_change_language_dd,
     )
     use_punctiation_c = ft.Checkbox(
@@ -71,8 +71,8 @@ def main(page: ft.Page):
     shift_slider = ft.Slider(
         min=0,
         value=1,
-        max=len(page.trithemius_cipher.trithemius_alphabet_table) - 2,
-        divisions=len(page.trithemius_cipher.trithemius_alphabet_table) - 2,
+        max=len(page.trisemus_cipher.Trisemus_alphabet_table) - 2,
+        divisions=len(page.trisemus_cipher.Trisemus_alphabet_table) - 2,
         on_change=shift_slider_changed,
     )
     message_tb = ft.TextField(
@@ -92,7 +92,7 @@ def main(page: ft.Page):
         multiline=True,
     )
 
-    page.add(
+    controls = [
         ft.Row(
             controls=[
                 ft.Text("Language"),
@@ -111,8 +111,5 @@ def main(page: ft.Page):
         message_tb,
         encrypted_tb,
         decrypted_tb,
-    )
-
-
-if __name__ == "__main__":
-    ft.app(main)
+    ]
+    return controls
