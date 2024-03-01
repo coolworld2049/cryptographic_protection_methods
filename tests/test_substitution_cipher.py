@@ -24,7 +24,7 @@ TEXT = {
 
 
 @pytest.mark.parametrize("lang,keyword", [("ru", "ключ"), ("en", "key")])
-def test_trisemus_cipher(lang: Literal["ru", "en"], keyword: str):
+def test_encrypt_decrypt(lang: Literal["ru", "en"], keyword: str):
     plaintext = TEXT[lang]
     trisemus_cipher = TrisemusSubstitutionCipher(lang=lang, keyword=keyword)
     encrypted_text = trisemus_cipher.encrypt(plaintext)

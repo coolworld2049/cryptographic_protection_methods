@@ -1,44 +1,52 @@
-from cipher.abc import AbstractCipher
+import string
+from typing import Literal
 
 
-class TranspositionCipher(AbstractCipher):
-    """Mirroring cipher"""
+class TranspositionCipher:
+    def __init__(self, block_size: int = 5, padding_str: str = "о"):
+        self.__block_size = block_size
+        self.__padding_str = padding_str
 
-    def __init__(self, mirror_char='О'):
-        self.mirror_char = mirror_char
+    @staticmethod
+    def prepare_text(text: str):
+        result = (
+            text.lower()
+            .replace(" ", "")
+            .translate(str.maketrans("", "", string.punctuation))
+        )
+        return result
 
-    def pad_text(self, text):
-        # Pad the text with the mirror character to make its length a multiple of 5
-        padding_size = (5 - len(text) % 5) % 5
-        padded_text = text + self.mirror_char * padding_size
-        return padded_text
+    def __pad_text(self, text: str):
+        remainder = len(text) % self.__block_size
+        if remainder != 0:
+            text += self.__padding_str * (self.__block_size - remainder)
+        return text
+
+    def __apply_transposition(self, text, action: Literal["encrypt", "decrypt"]):
+        text = self.prepare_text(text)
+        text = self.__pad_text(text)
+        result = []
+        for i in range(0, len(text), self.__block_size):
+            block = text[i : i + self.__block_size]
+            result.insert(-i, block[::-1])
+        result_text = " ".join(result)
+        return result_text
 
     def encrypt(self, plaintext):
-        # Pad the plaintext
-        padded_plaintext = self.pad_text(plaintext.upper())
+        return self.__apply_transposition(plaintext, action="encrypt")
 
-        # Apply mirror permutation
-        cipher_text = ''
-        for i in range(0, len(padded_plaintext), 5):
-            block = padded_plaintext[i:i + 5]
-            cipher_text += block[::-1]
-
-        return cipher_text
-
-    def decrypt(self, cipher_text):
-        # Apply reverse mirror permutation
-        decrypted_text = ''
-        for i in range(0, len(cipher_text), 5):
-            block = cipher_text[i:i + 5]
-            decrypted_text += block[::-1]
-
-        return decrypted_text.rstrip(self.mirror_char)
+    def decrypt(self, ciphertext):
+        plaintext = self.__apply_transposition(ciphertext, action="decrypt")
+        plaintext = plaintext.rstrip(self.__padding_str)
+        return plaintext
 
 
-plaintext = "ПУСТЬ БУДЕТ ТАК, КАК МЫ ХОТЕЛИ"
-mirror_cipher = TranspositionCipher()
-cipher_text = mirror_cipher.encrypt(plaintext)
-print("Encrypted:", cipher_text)
+transposition_cipher = TranspositionCipher()
 
-decrypted_text = mirror_cipher.decrypt(cipher_text)
-print("Decrypted:", decrypted_text)
+original_text = "пусть будет так, как мы хотели"
+encrypted_text = transposition_cipher.encrypt(original_text)
+decrypted_text = transposition_cipher.decrypt(encrypted_text)
+
+print(f"Original Text: {original_text}")
+print(f"Encrypted Text: {encrypted_text}")
+print(f"Decrypted Text: {decrypted_text}")
