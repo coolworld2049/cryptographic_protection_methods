@@ -4,14 +4,10 @@ from typing import Literal
 
 from loguru import logger
 
-from src.cipher.abstract_cipher import AbstractCipher
+from src.cipher.abc import AbstractCipher
 
 
-class TrisemusCipherException(Exception):
-    pass
-
-
-class TrisemusCipher(AbstractCipher):
+class TrisemusSubstitutionCipher(AbstractCipher):
     ALPHABETS = {
         "ru": "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
         "en": "abcdefghijklmnopqrstuvwxyz",

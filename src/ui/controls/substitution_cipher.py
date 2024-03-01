@@ -3,13 +3,13 @@ import typing
 import flet as ft
 from loguru import logger
 
-from cipher.replacement.trisemus import TrisemusCipher
+from cipher.substitution.algorithm import TrisemusSubstitutionCipher
 
 
-def trisemus_replacement_cipher_controls(
+def substitution_cipher_controls(
     page: ft.Page,
 ) -> list[typing.Type["ft.Control"]]:
-    page.trisemus_cipher = TrisemusCipher()
+    page.trisemus_cipher = TrisemusSubstitutionCipher()
     trisemus_cipher_error_t = ft.Text()
     trisemus_cipher_error_dlg = ft.AlertDialog(
         title=trisemus_cipher_error_t, bgcolor=ft.colors.ON_ERROR
@@ -17,7 +17,7 @@ def trisemus_replacement_cipher_controls(
 
     def on_change_message(e):
         try:
-            page.Trisemus_cipher = TrisemusCipher(
+            page.Trisemus_cipher = TrisemusSubstitutionCipher(
                 lang=language_dd.value,
                 keyword=keyword_tb.value,
                 shift=int(shift_tb.value),

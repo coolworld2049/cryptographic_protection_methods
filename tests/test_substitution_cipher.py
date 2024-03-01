@@ -4,7 +4,7 @@ from typing import Literal
 import pytest
 from loguru import logger
 
-from src.cipher.replacement.trisemus import TrisemusCipher
+from src.cipher.substitution.algorithm import TrisemusSubstitutionCipher
 
 logger.remove()
 logger.add(sys.stderr, level="INFO")
@@ -26,7 +26,7 @@ TEXT = {
 @pytest.mark.parametrize("lang,keyword", [("ru", "ключ"), ("en", "key")])
 def test_trisemus_cipher(lang: Literal["ru", "en"], keyword: str):
     plaintext = TEXT[lang]
-    trisemus_cipher = TrisemusCipher(lang=lang, keyword=keyword)
+    trisemus_cipher = TrisemusSubstitutionCipher(lang=lang, keyword=keyword)
     encrypted_text = trisemus_cipher.encrypt(plaintext)
     decrypted_text = trisemus_cipher.decrypt(encrypted_text)
     logger.info(trisemus_cipher)

@@ -1,6 +1,6 @@
 import flet as ft
 
-from ui.controls.trisemus_replacement_cipher import trisemus_replacement_cipher_controls
+from ui.controls.substitution_cipher import substitution_cipher_controls
 
 
 def main(page: ft.Page):
@@ -12,7 +12,7 @@ def main(page: ft.Page):
     def route_change(route):
         page.views.clear()
         c1 = ft.Container(
-            content=ft.Text("Trisemus Replacement Cipher", size=20),
+            content=ft.Text("Substitution  Cipher", size=20),
             margin=10,
             padding=10,
             alignment=ft.alignment.center,
@@ -20,10 +20,10 @@ def main(page: ft.Page):
             height=150,
             border_radius=10,
             ink=True,
-            on_click=lambda _: page.go("/trisemus_replacement_cipher"),
+            on_click=lambda _: page.go("/substitution_cipher"),
         )
         c2 = ft.Container(
-            content=ft.Text("Permutation Cipher", size=20),
+            content=ft.Text("Transposition Cipher", size=20),
             margin=10,
             padding=10,
             alignment=ft.alignment.center,
@@ -31,7 +31,7 @@ def main(page: ft.Page):
             height=150,
             border_radius=10,
             ink=True,
-            on_click=lambda _: page.go("/permutation_cipher"),
+            on_click=lambda _: page.go("/transposition_cipher"),
         )
         c3 = ft.Container(
             content=ft.Text("Gamma Cipher", size=20),
@@ -55,20 +55,20 @@ def main(page: ft.Page):
                 ],
             )
         )
-        if page.route == "/trisemus_replacement_cipher":
+        if page.route == "/substitution_cipher":
             page.views.append(
                 ft.View(
-                    "/trisemus_replacement_cipher",
+                    "/substitution_cipher",
                     controls=[
                         ft.AppBar(title=c1.content, bgcolor=ft.colors.SURFACE_VARIANT),
-                        *trisemus_replacement_cipher_controls(page),
+                        *substitution_cipher_controls(page),
                     ],
                 )
             )
-        elif page.route == "/permutation_cipher":
+        elif page.route == "/transposition_cipher":
             page.views.append(
                 ft.View(
-                    "/permutation_cipher",
+                    "/transposition_cipher",
                     controls=[
                         ft.AppBar(title=c2.content, bgcolor=ft.colors.SURFACE_VARIANT),
                     ],
