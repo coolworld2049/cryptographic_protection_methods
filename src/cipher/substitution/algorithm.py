@@ -62,26 +62,26 @@ class TrisemusSubstitutionCipher(AbstractCipher):
         if use_numbers:
             self.__alphabet += self.NUMBERS
 
-        self.Trisemus_alphabet_table = self.__generate_trisemus_table()
+        self.trisemus_alphabet_table = self.__generate_trisemus_table()
         if (
-            len(self.Trisemus_alphabet_table) > 0
-            and len(self.Trisemus_alphabet_table[-1]) < self.__row_length
+            len(self.trisemus_alphabet_table) > 0
+            and len(self.trisemus_alphabet_table[-1]) < self.__row_length
         ):
-            self.Trisemus_alphabet_table[-1].extend(
+            self.trisemus_alphabet_table[-1].extend(
                 [
                     ""
                     for _ in range(
-                        self.__row_length - len(self.Trisemus_alphabet_table[-1])
+                        self.__row_length - len(self.trisemus_alphabet_table[-1])
                     )
                 ]
             )
-        Trisemus_alphabet_table_string = pprint.pformat(
-            self.Trisemus_alphabet_table, indent=2
+        trisemus_alphabet_table_string = pprint.pformat(
+            self.trisemus_alphabet_table, indent=2
         )
-        logger.info(f"Trisemus_alphabet_table:\n{Trisemus_alphabet_table_string}")
+        logger.info(f"trisemus_alphabet_table:\n{trisemus_alphabet_table_string}")
         assert (
-            0 <= self.__shift < len(self.Trisemus_alphabet_table)
-        ), f"shift must be ge 0 and lt {len(self.Trisemus_alphabet_table)}"
+            0 <= self.__shift < len(self.trisemus_alphabet_table)
+        ), f"shift must be ge 0 and lt {len(self.trisemus_alphabet_table)}"
 
     def __repr__(self):
         return (
@@ -129,7 +129,7 @@ class TrisemusSubstitutionCipher(AbstractCipher):
 
         Если символ не найден, возвращается None.
         """
-        for row, row_chars in enumerate(self.Trisemus_alphabet_table):
+        for row, row_chars in enumerate(self.trisemus_alphabet_table):
             if char in row_chars:
                 col = row_chars.index(char)
                 return row, col
@@ -145,7 +145,7 @@ class TrisemusSubstitutionCipher(AbstractCipher):
 
         :return: tuple[int, int]: Кортеж (new_row, new_col) - новые координаты символа.
         """
-        return (row + shift) % len(self.Trisemus_alphabet_table), col
+        return (row + shift) % len(self.trisemus_alphabet_table), col
 
     def __process_message(
         self, message: str, shift: int, action: Literal["encrypt", "decrypt"]
@@ -166,9 +166,9 @@ class TrisemusSubstitutionCipher(AbstractCipher):
                 continue
             row, col = self.__find_position(char)
             new_row, new_col = self.__update_position(row, col, shift)
-            processed_text += self.Trisemus_alphabet_table[new_row][new_col]
+            processed_text += self.trisemus_alphabet_table[new_row][new_col]
             logger.debug(
-                f"{action} '{char}'[{row}, {col}] -> '{self.Trisemus_alphabet_table[new_row][new_col]}' [{new_row}, {new_col}]"
+                f"{action} '{char}'[{row}, {col}] -> '{self.trisemus_alphabet_table[new_row][new_col]}' [{new_row}, {new_col}]"
             )
         return processed_text
 
@@ -189,12 +189,12 @@ class TrisemusSubstitutionCipher(AbstractCipher):
             )
         return self.__process_message(plaintext, self.__shift, "encrypt")
 
-    def decrypt(self, ciphertext):
+    def decrypt(self, cipher_text):
         """
         Дешифрует переданный зашифрованный текст методом Тритемия.
 
-        :param ciphertext: str: Зашифрованный текст.
+        :param cipher_text: str: Зашифрованный текст.
 
         :return: str: Расшифрованный текст.
         """
-        return self.__process_message(ciphertext, -self.__shift, "decrypt")
+        return self.__process_message(cipher_text, -self.__shift, "decrypt")
