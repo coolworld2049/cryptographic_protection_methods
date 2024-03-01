@@ -93,6 +93,10 @@ class TrisemusSubstitutionCipher(AbstractCipher):
             f"use_numbers={self.__use_numbers})"
         )
 
+    @property
+    def keyword(self):
+        return self.__keyword
+
     @staticmethod
     def is_symbols_in_alphabet(
         text: str | list[str], alphabet: str | list[str]

@@ -7,6 +7,17 @@ class TranspositionCipher:
         self.__block_size = block_size
         self.__padding_str = padding_str
 
+    def __repr__(self):
+        return (
+            f"TranspositionCipher"
+            f"(block_size={self.__block_size}, "
+            f"padding_str={self.__padding_str})"
+        )
+
+    @property
+    def block_size(self):
+        return self.__block_size
+
     @staticmethod
     def prepare_text(text: str):
         result = (

@@ -1,6 +1,7 @@
 import flet as ft
 
 from ui.controls.substitution_cipher import substitution_cipher_controls
+from ui.controls.transposition_cipher import transposition_cipher_controls
 
 
 def main(page: ft.Page):
@@ -71,6 +72,7 @@ def main(page: ft.Page):
                     "/transposition_cipher",
                     controls=[
                         ft.AppBar(title=c2.content, bgcolor=ft.colors.SURFACE_VARIANT),
+                        *transposition_cipher_controls(page),
                     ],
                 )
             )
