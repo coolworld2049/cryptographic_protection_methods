@@ -6,7 +6,7 @@ authors = ["coolworld2049 <coolworld2049@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.13"
 loguru = "^0.7.2"
 flet = "^0.20.2"
 uvicorn = {extras = ["standart"], version = "^0.27.1"}

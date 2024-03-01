@@ -8,7 +8,7 @@ from ui.controls.substitution_cipher import substitution_cipher_controls
 from ui.controls.transposition_cipher import transposition_cipher_controls
 
 logger.remove()
-logger.add(sys.stdout, level=logging.DEBUG)
+logger.add(sys.stdout, level=logging.INFO)
 
 
 def main(page: ft.Page):
