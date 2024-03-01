@@ -39,14 +39,3 @@ class TranspositionCipher:
         plaintext = self.__apply_transposition(ciphertext, action="decrypt")
         plaintext = plaintext.rstrip(self.__padding_str)
         return plaintext
-
-
-transposition_cipher = TranspositionCipher()
-
-original_text = "пусть будет так, как мы хотели"
-encrypted_text = transposition_cipher.encrypt(original_text)
-decrypted_text = transposition_cipher.decrypt(encrypted_text)
-
-print(f"Original Text: {original_text}")
-print(f"Encrypted Text: {encrypted_text}")
-print(f"Decrypted Text: {decrypted_text}")
