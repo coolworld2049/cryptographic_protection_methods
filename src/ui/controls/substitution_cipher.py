@@ -3,7 +3,7 @@ import typing
 import flet as ft
 from loguru import logger
 
-from cipher.substitution.algorithm import TrisemusSubstitutionCipher
+from src.cipher.substitution.algorithm import TrisemusSubstitutionCipher
 
 
 def substitution_cipher_controls(
