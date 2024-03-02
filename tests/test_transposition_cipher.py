@@ -1,6 +1,6 @@
 from loguru import logger
 
-from src.cipher.transposition.algorithm import TranspositionCipher
+from ciphers.transposition.algorithm import TranspositionCipher
 
 
 def test_encrypt_decrypt():

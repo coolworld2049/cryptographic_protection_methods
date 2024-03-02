@@ -4,7 +4,7 @@ from typing import Literal
 import pytest
 from loguru import logger
 
-from src.cipher.substitution.algorithm import TrisemusSubstitutionCipher
+from ciphers.substitution.algorithm import TrisemusSubstitutionCipher
 
 logger.remove()
 logger.add(sys.stderr, level="INFO")
