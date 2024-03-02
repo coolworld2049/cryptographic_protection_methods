@@ -1,5 +1,4 @@
 import string
-from typing import Literal
 
 from ciphers.abc import AbstractCipher
 
@@ -35,7 +34,7 @@ class TranspositionCipher(AbstractCipher):
             text += self.__padding_str * (self.__block_size - remainder)
         return text
 
-    def __apply_transposition(self, text, action: Literal["encrypt", "decrypt"]):
+    def __apply_transposition(self, text):
         text = self.prepare_text(text)
         text = self.__pad_text(text)
         result = []
@@ -46,9 +45,9 @@ class TranspositionCipher(AbstractCipher):
         return result_text
 
     def encrypt(self, plaintext):
-        return self.__apply_transposition(plaintext, action="encrypt")
+        return self.__apply_transposition(plaintext)
 
     def decrypt(self, ciphertext):
-        plaintext = self.__apply_transposition(ciphertext, action="decrypt")
+        plaintext = self.__apply_transposition(ciphertext)
         plaintext = plaintext.rstrip(self.__padding_str)
         return plaintext

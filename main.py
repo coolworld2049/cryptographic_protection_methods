@@ -141,7 +141,7 @@ def transposition_cipher_controls(
         hint_text="Enter message to encrypt",
         on_change=on_change,
     )
-    message_tx.value = "ПУСТЬ БУДЕТ ТАК, КАК МЫ ХОТЕЛИ"
+    message_tx.value = "пусть будет так, как мы хотели"
     encrypted_tx = ft.TextField(
         label="Encrypted",
         read_only=True,
@@ -153,7 +153,7 @@ def transposition_cipher_controls(
         read_only=True,
         multiline=True,
     )
-    decrypted_tx.value = page.cipher.encrypt(encrypted_tx.value)
+    decrypted_tx.value = page.cipher.decrypt(encrypted_tx.value)
 
     controls = [
         block_size_slider,
@@ -176,7 +176,7 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "./assets/gravity_falls.png",
+                        "gravity_falls.png",
                         width=150,
                         height=150,
                         fit=ft.ImageFit.CONTAIN,
@@ -197,7 +197,7 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "./assets/scytale.png",
+                        "scytale.png",
                         width=150,
                         height=150,
                         fit=ft.ImageFit.CONTAIN,
@@ -218,7 +218,7 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "./assets/gamma.png",
+                        "gamma.png",
                         width=150,
                         height=150,
                         fit=ft.ImageFit.CONTAIN,
