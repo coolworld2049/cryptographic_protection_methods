@@ -176,7 +176,7 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "assets/gravity_falls.png",
+                        "./assets/gravity_falls.png",
                         width=150,
                         height=150,
                         fit=ft.ImageFit.CONTAIN,
@@ -197,7 +197,7 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "assets/scytale.png",
+                        "./assets/scytale.png",
                         width=150,
                         height=150,
                         fit=ft.ImageFit.CONTAIN,
@@ -218,7 +218,7 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "assets/gamma.png",
+                        "./assets/gamma.png",
                         width=150,
                         height=150,
                         fit=ft.ImageFit.CONTAIN,

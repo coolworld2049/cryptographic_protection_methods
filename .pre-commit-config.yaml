@@ -12,3 +12,7 @@ repos:
         language: system
         entry: bash scripts/poetry_export.sh
         always_run: true
+      - id: flet-pack
+        name: flet-pack
+        language: system
+        entry: bash -x scripts/flet_pack.sh

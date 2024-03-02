@@ -2,10 +2,12 @@
 
 flet pack main.py -v -y \
 --name cryptographic_protection_methods \
+--product-name cryptographic_protection_methods \
+--company-name coolworld2049
 --hidden-import=ciphers \
 --add-data "assets;assets" \
---distpath release
+-i assets/gravity_falls.png
 
-git add release
+git add -f dist
 rm -r build
-rm cryptographic_protection_methods.spec
+rm *.spec
