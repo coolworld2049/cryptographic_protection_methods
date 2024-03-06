@@ -165,8 +165,8 @@ def transposition_cipher_controls(
 
 
 def main(page: ft.Page):
-    page.title = "Cryptographic algorithms"
-    page.window_width = 600
+    page.title = "Криптографические алгоритмы шифрования"
+    page.window_width = 700
     page.vertical_alignment = ft.MainAxisAlignment.SPACE_BETWEEN
     page.window_center()
 
@@ -176,73 +176,74 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "gravity_falls.png",
-                        width=150,
-                        height=150,
-                        fit=ft.ImageFit.CONTAIN,
+                        "replace.png",
+                        fit=ft.ImageFit.FILL,
                     ),
-                    ft.Text("Substitution  Cipher", size=20),
+                    ft.Text("Замена", size=20),
                 ],
             ),
             margin=10,
             padding=10,
             alignment=ft.alignment.center,
-            width=150,
-            height=150,
+            width=180,
+            height=180,
             border_radius=10,
             ink=True,
             on_click=lambda _: page.go("/substitution_cipher"),
+            bgcolor=ft.colors.SURFACE_VARIANT,
         )
         c2 = ft.Container(
             content=ft.Column(
                 [
                     ft.Image(
-                        "scytale.png",
-                        width=150,
-                        height=150,
-                        fit=ft.ImageFit.CONTAIN,
+                        "transpose.png",
+                        fit=ft.ImageFit.FILL,
                     ),
-                    ft.Text("Transposition Cipher", size=20),
+                    ft.Text("Перестановка", size=20),
                 ],
             ),
             margin=10,
             padding=10,
             alignment=ft.alignment.center,
-            width=150,
-            height=150,
+            width=180,
+            height=180,
             border_radius=10,
             ink=True,
             on_click=lambda _: page.go("/transposition_cipher"),
+            bgcolor=ft.colors.SURFACE_VARIANT,
         )
         c3 = ft.Container(
             content=ft.Column(
                 [
                     ft.Image(
                         "gamma.png",
-                        width=150,
-                        height=150,
-                        fit=ft.ImageFit.CONTAIN,
+                        fit=ft.ImageFit.FILL,
                     ),
-                    ft.Text("Gamma  Cipher", size=20),
+                    ft.Text("Гаммирование", size=20),
                 ],
             ),
             margin=10,
             padding=10,
             alignment=ft.alignment.center,
-            width=150,
-            height=150,
+            width=180,
+            height=180,
             border_radius=10,
             ink=True,
             on_click=lambda _: page.go("/gamma_cipher"),
+            bgcolor=ft.colors.SURFACE_VARIANT,
         )
         page.views.append(
             ft.View(
                 "/",
                 [
+                    ft.Container(
+                        ft.Text("Методы шифрования", size=40),
+                        alignment=ft.alignment.center,
+                    ),
                     ft.Row(
                         controls=[c1, c2, c3],
                         alignment=ft.MainAxisAlignment.CENTER,
-                    )
+                    ),
                 ],
             )
         )
