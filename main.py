@@ -14,10 +14,11 @@ def substitution_cipher_controls(
     error_t = ft.Text()
     error_dlg = ft.AlertDialog(title=error_t, bgcolor=ft.colors.ON_ERROR)
 
+    DEFAULT_MESSAGE = "слива"
+
     def on_change(e):
         try:
             page.cipher = TrisemusSubstitutionCipher(
-                lang=language_dd.value,
                 keyword=keyword_tb.value,
                 shift=int(shift_slider.value),
                 use_punctiation=use_punctiation_c.value,
@@ -35,29 +36,17 @@ def substitution_cipher_controls(
             error_dlg.open = True
         page.update()
 
-    def on_change_language_dd(e):
-        language_dd.value = e.control.value
-        keyword_tb.value = None
+    def on_change_params(e):
+        if message_tb.value != DEFAULT_MESSAGE:
+            message_tb.value = ""
         shift_slider.value = 1
-        message_tb.value = None
-        encrypted_tb.value = None
-        decrypted_tb.value = None
         page.update()
         on_change(e)
 
-    language_dd = ft.Dropdown(
-        width=100,
-        options=[
-            ft.dropdown.Option("ru"),
-            ft.dropdown.Option("en"),
-        ],
-        value=page.cipher.lang,
-        on_change=on_change_language_dd,
-    )
     use_punctiation_c = ft.Checkbox(
-        label="Punctiation", value=True, on_change=on_change
+        label="Punctiation", value=True, on_change=on_change_params
     )
-    use_numbers_c = ft.Checkbox(label="Numbers", value=True, on_change=on_change)
+    use_numbers_c = ft.Checkbox(label="Numbers", value=True, on_change=on_change_params)
     keyword_tb = ft.TextField(
         label="key", value=page.cipher.keyword, on_change=on_change
     )
@@ -75,7 +64,7 @@ def substitution_cipher_controls(
         hint_text="Enter message to encrypt",
         on_change=on_change,
     )
-    message_tb.value = "слива"
+    message_tb.value = DEFAULT_MESSAGE
     encrypted_tb = ft.TextField(
         label="Encrypted",
         read_only=True,
@@ -89,12 +78,6 @@ def substitution_cipher_controls(
     )
     decrypted_tb.value = page.cipher.decrypt(encrypted_tb.value)
     controls = [
-        ft.Row(
-            controls=[
-                ft.Text("Language"),
-                language_dd,
-            ]
-        ),
         keyword_tb,
         shift_slider,
         ft.Row(
@@ -103,6 +86,7 @@ def substitution_cipher_controls(
                 use_numbers_c,
             ]
         ),
+        ft.Divider(),
         message_tb,
         encrypted_tb,
         decrypted_tb,
@@ -157,6 +141,7 @@ def transposition_cipher_controls(
 
     controls = [
         block_size_slider,
+        ft.Divider(),
         message_tx,
         encrypted_tx,
         decrypted_tx,
@@ -179,7 +164,7 @@ def main(page: ft.Page):
                         "replace.png",
                         fit=ft.ImageFit.FILL,
                     ),
-                    ft.Text("Замена", size=20),
+                    ft.Text("Метод Замены. Шифр Трисемуса", size=20),
                 ],
             ),
             margin=10,
@@ -199,7 +184,7 @@ def main(page: ft.Page):
                         "transpose.png",
                         fit=ft.ImageFit.FILL,
                     ),
-                    ft.Text("Перестановка", size=20),
+                    ft.Text("Метод перестановки. Простая перестановка", size=20),
                 ],
             ),
             margin=10,
@@ -219,7 +204,7 @@ def main(page: ft.Page):
                         "gamma.png",
                         fit=ft.ImageFit.FILL,
                     ),
-                    ft.Text("Гаммирование", size=20),
+                    ft.Text("Метод гаммирования", size=20),
                 ],
             ),
             margin=10,

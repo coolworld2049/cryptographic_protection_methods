@@ -25,7 +25,7 @@ class TrisemusSubstitutionCipher(AbstractCipher):
         use_numbers: bool = True,
     ):
         """
-        :param lang: Literal["ru", "en"] | str: Язык алфавита (русский или английский).
+        :param lang: Literal["ru", "en"] | str: Язык алфавита
         :param keyword: str: Ключевое слово для шифрования.
         :param shift: int: Сдвиг для шифрования.
         :param use_punctiation: bool: Флаг использования знаков препинания.
