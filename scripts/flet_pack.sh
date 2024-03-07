@@ -13,7 +13,7 @@ flet pack main.py -v -y \
 
 set +e
 
-git add -f dist
+git add -f output
 rm -r build
 rm *.spec generated*
 
