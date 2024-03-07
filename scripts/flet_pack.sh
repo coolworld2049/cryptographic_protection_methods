@@ -8,7 +8,8 @@ flet pack main.py -v -y \
 --hidden-import=ciphers \
 --add-data "assets;assets" \
 --icon assets/gravity_falls.png \
---copyright "$NAME"
+--copyright "$NAME" \
+--distpath output
 
 set +e
 
