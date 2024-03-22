@@ -201,10 +201,16 @@ def main(page: ft.Page):
             content=ft.Column(
                 [
                     ft.Image(
-                        "gamma.png",
+                        "grasshooper.png",
                         fit=ft.ImageFit.FILL,
                     ),
-                    ft.Text("Метод гаммирования", size=20),
+                    ft.Text(
+                        "Метод блочного шифрования Кузнечик",
+                        size=20,
+                    ),
+                    ft.Text(
+                        "в режиме гаммирования с обратной связью по выходу",
+                    ),
                 ],
             ),
             margin=10,
@@ -214,7 +220,7 @@ def main(page: ft.Page):
             height=180,
             border_radius=10,
             ink=True,
-            on_click=lambda _: page.go("/gamma_cipher"),
+            on_click=lambda _: page.go("/block"),
             bgcolor=ft.colors.SURFACE_VARIANT,
         )
         page.views.append(
@@ -258,10 +264,10 @@ def main(page: ft.Page):
                     ],
                 )
             )
-        elif page.route == "/gamma_cipher":
+        elif page.route == "/block":
             page.views.append(
                 ft.View(
-                    "/gamma_cipher",
+                    "/block",
                     controls=[
                         ft.AppBar(
                             title=c3.content.controls[1],
