@@ -11,7 +11,8 @@ from ciphers.block.utils import check_value
 from ciphers.block.utils import zero_fill
 
 logger.remove()
-logger.add(sys.stdout)
+if sys.stdout:
+    logger.add(sys.stdout)
 pathlib.Path("log.log").unlink(missing_ok=True)
 logger.add("log.log", format="\n{name}:{function}\n{message}")
 
