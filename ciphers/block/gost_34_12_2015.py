@@ -1,4 +1,7 @@
+import json
 from typing import List
+
+from loguru import logger
 
 from ciphers.block.const import (
     _BLOCK_SIZE_KUZNECHIK,
@@ -11,27 +14,52 @@ from ciphers.block.utils import add_xor
 from ciphers.block.utils import zero_fill
 
 
-class GOST34122015Kuznechik:
+class GOST_34_12_2015_Kuznechik:
+    """
+    ГОСТ Р 34.12-2015 КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА ИНФОРМАЦИИ. Блочные шифры
+
+    Алгоритм блочного шифрования с длиной блока n = 128 бит «Кузнечик»
+    """
+
     def __init__(self, key: bytearray):
+        # Initialize cipher_c and cipher_iter_key
         self._cipher_c: List[bytearray] = []
         self._cipher_iter_key = []
         self._cipher_get_c()
+
+        # Split key into two halves
         key_1 = key[: _KEY_SIZE // 2]
         key_2 = key[_KEY_SIZE // 2 :]
+
+        # Generate iterative keys
         internal = bytearray(_KEY_SIZE // 2)
         self._cipher_iter_key.append(key_1)
         self._cipher_iter_key.append(key_2)
+        logger.debug(
+            f"{self.__class__.__name__}\n{json.dumps(dict(internal=internal), indent=2, default=str)}"
+        )
         for i in range(4):
             for j in range(8):
                 internal = add_xor(key_1, self._cipher_c[i * 8 + j])
-                internal = GOST34122015Kuznechik._cipher_s(internal)
-                internal = GOST34122015Kuznechik._cipher_l(internal)
+                internal = GOST_34_12_2015_Kuznechik._cipher_s(internal)
+                internal = GOST_34_12_2015_Kuznechik._cipher_l(internal)
                 key_1, key_2 = [add_xor(internal, key_2), key_1]
+
             self._cipher_iter_key.append(key_1)
             self._cipher_iter_key.append(key_2)
+
+        logger.warning(
+            f"{self.__class__.__name__}\n{json.dumps(dict(key_size=_KEY_SIZE, key=key, key_1=key_1, key_2=key_2, ), indent=2, default=str)}"
+        )
+
+        # Clear keys for security reasons
         key_1 = bytearray(self.key_size // 2)
         key_2 = bytearray(self.key_size // 2)
         key = bytearray(self.key_size)
+
+        logger.debug(
+            f"{self.__class__.__name__}\n{json.dumps(self.__dict__, indent=2, default=str)}"
+        )
 
     def __del__(self) -> None:
         """
@@ -81,7 +109,7 @@ class GOST34122015Kuznechik:
         result = bytearray(_BLOCK_SIZE_KUZNECHIK)
         result = data
         for _ in range(16):
-            result = GOST34122015Kuznechik._cipher_r(result)
+            result = GOST_34_12_2015_Kuznechik._cipher_r(result)
         return result
 
     @staticmethod
@@ -89,14 +117,14 @@ class GOST34122015Kuznechik:
         result = bytearray(_BLOCK_SIZE_KUZNECHIK)
         result = data
         for _ in range(16):
-            result = GOST34122015Kuznechik._cipher_r_reverse(result)
+            result = GOST_34_12_2015_Kuznechik._cipher_r_reverse(result)
         return result
 
     def _cipher_get_c(self) -> None:
         for i in range(1, 33):
             internal = bytearray(_BLOCK_SIZE_KUZNECHIK)
             internal[15] = i
-            self._cipher_c.append(GOST34122015Kuznechik._cipher_l(internal))
+            self._cipher_c.append(GOST_34_12_2015_Kuznechik._cipher_l(internal))
 
     @property
     def block_size(self) -> int:
@@ -132,8 +160,8 @@ class GOST34122015Kuznechik:
         block = bytearray(block)
         block = add_xor(self._cipher_iter_key[9], block)
         for i in range(8, -1, -1):
-            block = GOST34122015Kuznechik._cipher_l_reverse(block)
-            block = GOST34122015Kuznechik._cipher_s_reverse(block)
+            block = GOST_34_12_2015_Kuznechik._cipher_l_reverse(block)
+            block = GOST_34_12_2015_Kuznechik._cipher_s_reverse(block)
             block = add_xor(self._cipher_iter_key[i], block)
         return block
 
@@ -149,11 +177,17 @@ class GOST34122015Kuznechik:
             The block of ciphertext.
         """
         block = bytearray(block)
+        logger.debug(
+            f"{self.__class__.__name__}\n{json.dumps(dict(block_before=block), indent=2, default=str)}"
+        )
         for i in range(9):
             block = add_xor(self._cipher_iter_key[i], block)
-            block = GOST34122015Kuznechik._cipher_s(block)
-            block = GOST34122015Kuznechik._cipher_l(block)
-        block = add_xor(self._cipher_iter_key[9], block)
+            block = GOST_34_12_2015_Kuznechik._cipher_s(block)
+            block = GOST_34_12_2015_Kuznechik._cipher_l(block)
+            block = add_xor(self._cipher_iter_key[9], block)
+        logger.debug(
+            f"{self.__class__.__name__}\n{json.dumps(dict(block_after=block), indent=2, default=str)}"
+        )
         return block
 
     def clear(self) -> None:

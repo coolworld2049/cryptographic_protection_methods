@@ -39,7 +39,7 @@ class TranspositionCipher(AbstractCipher):
         text = self.__pad_text(text)
         result = []
         for i in range(0, len(text), self.__block_size):
-            block = text[i: i + self.__block_size]
+            block = text[i : i + self.__block_size]
             result.insert(-i, block[::-1])
         result_text = " ".join(result)
         return result_text

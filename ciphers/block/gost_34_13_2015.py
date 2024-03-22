@@ -1,22 +1,34 @@
-from abc import ABC, abstractmethod
+import json
+import pathlib
+import sys
 
 from loguru import logger
 
-from ciphers.block.const import _DEFAULT_IV_KUZNECHIK
-from ciphers.block.gost_34_12_2015 import GOST34122015Kuznechik
-from utils import add_xor
-from utils import check_value
-from utils import zero_fill
+from ciphers.block.const import _KEY_SIZE
+from ciphers.block.gost_34_12_2015 import GOST_34_12_2015_Kuznechik
+from ciphers.block.utils import add_xor
+from ciphers.block.utils import check_value
+from ciphers.block.utils import zero_fill
 
-_KEY_SIZE: int = 32
+logger.remove()
+logger.add(sys.stdout)
+pathlib.Path("log.log").unlink(missing_ok=True)
+logger.add("log.log", format="\n{name}:{function}\n{message}")
 
 
-class GOST34132015(ABC):
+class GOST_34_13_2015:
+    """
+    ГОСТ Р 34.13-2015 КРИПТОГРАФИЧЕСКАЯ ЗАЩИТА. Режимы работы блочных шифров
+    """
+
     def __init__(self, key: bytearray) -> None:
         if not check_value(key, _KEY_SIZE):
+            key_size = len(key)
             key = zero_fill(key)
-            raise GOSTCipherError("GOSTCipherError: invalid key value")
-        self._cipher_obj = GOST34122015Kuznechik(key)
+            raise GOSTCipherError(
+                f"GOSTCipherError: invalid key value. Your key size {key_size} != {_KEY_SIZE}"
+            )
+        self._cipher_obj = GOST_34_12_2015_Kuznechik(key)
 
     def __del__(self) -> None:
         self.clear()
@@ -44,28 +56,21 @@ class GOST34132015(ABC):
         """
         return self._cipher_obj.block_size
 
+    @property
+    def key_size(self) -> int:
+        """
+        Return the value of the internal block size of the cipher algorithm.
 
-class GOST34132015Cipher(GOST34132015, ABC):
-
-    @abstractmethod
-    def encrypt(self, data: bytearray) -> bytearray:
-        if not isinstance(data, (bytes, bytearray)):
-            self.clear()
-            raise GOSTCipherError("GOSTCipherError: invalid plaintext data")
-        return data
-
-    @abstractmethod
-    def decrypt(self, data: bytearray) -> bytearray:
-        if not isinstance(data, (bytes, bytearray)):
-            self.clear()
-            raise GOSTCipherError("GOSTCipherError: invalid ciphertext data")
-        return data
+        For the 'kuznechik' algorithm this value is 16 and the 'magma'
+        algorithm, this value is 8.
+        """
+        return self._cipher_obj.key_size
 
 
-class GOST34132015CipherFeedBack(GOST34132015Cipher, ABC):
+class GOST_34_13_2015_GammaOutputFeedback(GOST_34_13_2015):
 
     def __init__(self, key: bytearray, init_vect: bytearray) -> None:
-        GOST34132015Cipher.__init__(self, key)
+        super().__init__(key)
         check_init_vect = isinstance(init_vect, (bytes, bytearray))
         if (not check_init_vect) or (len(init_vect) % self.block_size) != 0:
             self.clear()
@@ -74,87 +79,64 @@ class GOST34132015CipherFeedBack(GOST34132015Cipher, ABC):
             )
         self._init_vect = init_vect
         self._init_vect = bytearray(self._init_vect)
+        logger.debug(f"{self.__class__.__name__}\n{dict(_init_vect=self._init_vect)}")
 
     def _get_gamma(self) -> bytearray:
-        return self._cipher_obj.encrypt(self._init_vect[0: self.block_size])
+        return self._cipher_obj.encrypt(self._init_vect[0 : self.block_size])
 
     def _set_init_vect(self, data: bytearray):
-        iter_iv_hi = self._init_vect[self.block_size: len(self._init_vect)]
-        self._init_vect[0: len(self._init_vect) - self.block_size] = iter_iv_hi
+        iter_iv_hi = self._init_vect[self.block_size : len(self._init_vect)]
+        self._init_vect[0 : len(self._init_vect) - self.block_size] = iter_iv_hi
         begin_iv_low = len(self._init_vect) - self.block_size
         end_iv_low = len(self._init_vect)
         self._init_vect[begin_iv_low:end_iv_low] = data
 
     def _get_final_block(self, data):
-        return data[self.block_size * self._get_num_block(data)::]
+        return data[self.block_size * self._get_num_block(data) : :]
 
     def _final_cipher(self, data):
         gamma = self._get_gamma()
         cipher_block = self._get_final_block(data)
         return add_xor(gamma, cipher_block)
 
-    @abstractmethod
     def encrypt(self, data: bytearray) -> bytearray:
-        data = GOST34132015Cipher.encrypt(self, data)
-        return data
+        if not isinstance(data, (bytes, bytearray)):
+            self.clear()
+            raise GOSTCipherError("GOSTCipherError: invalid plaintext data")
+        result = bytearray()
+        gamma = bytearray()
+        logger.debug(
+            f"{self.__class__.__name__}\n number of blocks {self._get_num_block(data)}"
+        )
+        for i in range(self._get_num_block(data)):
+            gamma = self._get_gamma()
+            cipher_block = self._get_block(data, i)
+            result += add_xor(gamma, cipher_block)
+            self._set_init_vect(gamma[0 : self.block_size])
+            log_message = dict(gamma=gamma, cipher_block=cipher_block, result=result)
+            logger.debug(
+                f"{self.__class__.__name__}\n[block][{i}]\n{json.dumps(log_message, indent=2, default=str)}"
+            )
 
-    @abstractmethod
+        if len(data) % self.block_size != 0:
+            result += self._final_cipher(data)
+            logger.debug(
+                f"{self.__class__.__name__}\n final cipher result\n{json.dumps(dict(result=result), indent=2, default=str)}"
+            )
+        return result
+
     def decrypt(self, data: bytearray) -> bytearray:
-        data = GOST34132015Cipher.decrypt(self, data)
-        return data
+        if not isinstance(data, (bytes, bytearray)):
+            self.clear()
+            raise GOSTCipherError("GOSTCipherError: invalid ciphertext data")
+        logger.debug(f"{self.__class__.__name__}\n[decrypt] >>>")
+        return self.encrypt(data)
 
     @property
     def iv(self) -> bytearray:
         """Return the value of the initializing vector."""
-        return self._init_vect[len(self._init_vect) - self.block_size::]
-
-
-class GOST34132015ofb(GOST34132015CipherFeedBack):
-    def encrypt(self, data: bytearray) -> bytearray:
-        result = bytearray()
-        gamma = bytearray()
-        data = super().encrypt(data)
-        for i in range(self._get_num_block(data)):
-            gamma = self._get_gamma()
-            cipher_block = self._get_block(data, i)
-            result = result + add_xor(gamma, cipher_block)
-            self._set_init_vect(gamma[0: self.block_size])
-        if len(data) % self.block_size != 0:
-            result = result + self._final_cipher(data)
-        return result
-
-    def decrypt(self, data: bytearray) -> bytearray:
-        super().decrypt(data)
-        return self.encrypt(data)
+        return self._init_vect[len(self._init_vect) - self.block_size : :]
 
 
 class GOSTCipherError(Exception):
     pass
-
-
-if __name__ == "__main__":
-    # fmt: off
-    key = bytearray([
-        0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-        0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
-    ])
-
-    # fmt: on
-
-    cipher_obj = GOST34132015ofb(key=key, init_vect=_DEFAULT_IV_KUZNECHIK)
-
-    plain_text = (
-        "Я в своем познании настолько преисполнился, что я как будто бы уже сто триллионов миллиардов"
-        " лет проживаю на триллионах и триллионах таких же планет, как эта Земля, мне этот мир"
-        " абсолютно понятен, и я здесь ищу только одного - покоя, умиротворения"
-    )
-    encrypted_data = cipher_obj.encrypt(plain_text.encode("utf-8"))
-
-    cipher_obj = GOST34132015ofb(key=key, init_vect=_DEFAULT_IV_KUZNECHIK)
-    decrypted_data = cipher_obj.decrypt(encrypted_data)
-    decrypted_text = decrypted_data.decode('utf-8', errors='ignore')
-
-    logger.info(f"plain_text: {plain_text}")
-    logger.info(f"encrypted_data: {encrypted_data}")
-    logger.info(f"decrypted_text: {decrypted_text}")
-    assert plain_text == decrypted_text
