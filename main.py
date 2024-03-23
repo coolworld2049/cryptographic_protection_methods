@@ -177,8 +177,10 @@ def block_cipher_controls(
     gost_34_13_2015_log_file_io = gost_34_13_2015.log_path.open("r")
 
     def fill_log_lv(e: ft.ControlEvent | None = None):
-        for v in gost_34_13_2015_log_file_io.readlines():
-            log_lv.controls.append(ft.Text(v))
+        log_lv.controls.clear()
+        data = gost_34_13_2015_log_file_io.readlines()
+        for v in range(0, len(data), 20):
+            log_lv.controls.append(ft.Text("".join(data[v:v + 20])))
 
     def on_change(e):
         try:
