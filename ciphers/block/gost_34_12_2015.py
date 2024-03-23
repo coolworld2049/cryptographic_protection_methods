@@ -29,15 +29,13 @@ class GOST_34_12_2015_Kuznechik:
 
         # Split key into two halves
         key_1 = key[: _KEY_SIZE // 2]
-        key_2 = key[_KEY_SIZE // 2 :]
+        key_2 = key[_KEY_SIZE // 2:]
 
         # Generate iterative keys
         internal = bytearray(_KEY_SIZE // 2)
         self._cipher_iter_key.append(key_1)
         self._cipher_iter_key.append(key_2)
-        logger.debug(
-            f"{self.__class__.__name__}\n{json.dumps(dict(internal=internal), indent=2, default=str)}"
-        )
+
         for i in range(4):
             for j in range(8):
                 internal = add_xor(key_1, self._cipher_c[i * 8 + j])
@@ -49,7 +47,7 @@ class GOST_34_12_2015_Kuznechik:
             self._cipher_iter_key.append(key_2)
 
         logger.warning(
-            f"{self.__class__.__name__}\n{json.dumps(dict(key_size=_KEY_SIZE, key=key, key_1=key_1, key_2=key_2, ), indent=2, default=str)}"
+            f"{self.__class__.__name__}\n{json.dumps(dict(key_size=_KEY_SIZE, key=key, key_1=key_1, key_2=key_2, internal=internal), indent=2, default=str)}"
         )
 
         # Clear keys for security reasons

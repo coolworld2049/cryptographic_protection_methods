@@ -17,7 +17,7 @@ if sys.stdout is None:
 logger.add(sys.stdout)
 log_path = pathlib.Path(__file__).parent.joinpath("log.log")
 log_path.unlink(missing_ok=True)
-logger.add(log_path, format="\n{name}:{function}\n{message}")
+logger.add(log_path)
 
 
 class GOST_34_13_2015:

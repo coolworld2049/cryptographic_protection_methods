@@ -174,9 +174,10 @@ def block_cipher_controls(
     error_dlg = ft.AlertDialog(title=error_t, bgcolor=ft.colors.ON_ERROR)
 
     DEFAULT_MESSAGE = "секретный текст"
+    gost_34_13_2015_log_file_io = gost_34_13_2015.log_path.open("r")
 
     def fill_log_lv(e: ft.ControlEvent | None = None):
-        for v in gost_34_13_2015.log_path.open("r").readlines():
+        for v in gost_34_13_2015_log_file_io.readlines():
             log_lv.controls.append(ft.Text(v))
 
     def on_change(e):
@@ -229,7 +230,7 @@ def block_cipher_controls(
     )
     decrypted_tb.value = page.decrypt_cipher_obj.decrypt(encrypted_tb.value).decode()
 
-    log_lv = ft.ListView(expand=True, spacing=0)
+    log_lv = ft.ListView(expand=True, spacing=0, auto_scroll=True)
     fill_log_lv()
     controls = [
         ft.Row(
