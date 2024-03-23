@@ -1,4 +1,5 @@
 import json
+import os
 import pathlib
 import sys
 
@@ -11,10 +12,12 @@ from ciphers.block.utils import check_value
 from ciphers.block.utils import zero_fill
 
 logger.remove()
-if sys.stdout:
-    logger.add(sys.stdout)
-pathlib.Path("log.log").unlink(missing_ok=True)
-logger.add("log.log", format="\n{name}:{function}\n{message}")
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, 'w')
+logger.add(sys.stdout)
+log_path = pathlib.Path(__file__).parent.joinpath("log.log")
+log_path.unlink(missing_ok=True)
+logger.add(log_path, format="\n{name}:{function}\n{message}")
 
 
 class GOST_34_13_2015:
@@ -76,24 +79,26 @@ class GOST_34_13_2015_GammaOutputFeedback(GOST_34_13_2015):
         if (not check_init_vect) or (len(init_vect) % self.block_size) != 0:
             self.clear()
             raise GOSTCipherError(
-                "GOSTCipherError: invalid initialization vector value"
+                f"GOSTCipherError: invalid initialization vector value.\n"
+                f"Condition: len(init_vect) % self.block_size != 0.\n"
+                f"Result: {len(init_vect)} % {self.block_size} = {len(init_vect) % self.block_size}"
             )
         self._init_vect = init_vect
         self._init_vect = bytearray(self._init_vect)
         logger.debug(f"{self.__class__.__name__}\n{dict(_init_vect=self._init_vect)}")
 
     def _get_gamma(self) -> bytearray:
-        return self._cipher_obj.encrypt(self._init_vect[0 : self.block_size])
+        return self._cipher_obj.encrypt(self._init_vect[0: self.block_size])
 
     def _set_init_vect(self, data: bytearray):
-        iter_iv_hi = self._init_vect[self.block_size : len(self._init_vect)]
-        self._init_vect[0 : len(self._init_vect) - self.block_size] = iter_iv_hi
+        iter_iv_hi = self._init_vect[self.block_size: len(self._init_vect)]
+        self._init_vect[0: len(self._init_vect) - self.block_size] = iter_iv_hi
         begin_iv_low = len(self._init_vect) - self.block_size
         end_iv_low = len(self._init_vect)
         self._init_vect[begin_iv_low:end_iv_low] = data
 
     def _get_final_block(self, data):
-        return data[self.block_size * self._get_num_block(data) : :]
+        return data[self.block_size * self._get_num_block(data)::]
 
     def _final_cipher(self, data):
         gamma = self._get_gamma()
@@ -113,7 +118,7 @@ class GOST_34_13_2015_GammaOutputFeedback(GOST_34_13_2015):
             gamma = self._get_gamma()
             cipher_block = self._get_block(data, i)
             result += add_xor(gamma, cipher_block)
-            self._set_init_vect(gamma[0 : self.block_size])
+            self._set_init_vect(gamma[0: self.block_size])
             log_message = dict(gamma=gamma, cipher_block=cipher_block, result=result)
             logger.debug(
                 f"{self.__class__.__name__}\n[block][{i}]\n{json.dumps(log_message, indent=2, default=str)}"
@@ -136,7 +141,7 @@ class GOST_34_13_2015_GammaOutputFeedback(GOST_34_13_2015):
     @property
     def iv(self) -> bytearray:
         """Return the value of the initializing vector."""
-        return self._init_vect[len(self._init_vect) - self.block_size : :]
+        return self._init_vect[len(self._init_vect) - self.block_size::]
 
 
 class GOSTCipherError(Exception):

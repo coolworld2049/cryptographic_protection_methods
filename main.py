@@ -3,6 +3,7 @@ import typing
 import flet as ft
 from loguru import logger
 
+from ciphers.block import gost_34_13_2015
 from ciphers.block.gost_34_13_2015 import GOST_34_13_2015_GammaOutputFeedback
 from ciphers.substitution.algorithm import TrisemusSubstitutionCipher
 from ciphers.transposition.algorithm import TranspositionCipher
@@ -159,36 +160,36 @@ def block_cipher_controls(
     def bytearry_to_str(data: bytearray):
         return data.decode(errors="ignore")
 
-    # fmt: off
-    init_vect: bytearray = bytearray([
-        0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xce, 0xf0,
-        0xa1, 0xb2, 0xc3, 0xd4, 0xe5, 0xf0, 0x01, 0x12,
-        0x23, 0x34, 0x45, 0x56, 0x67, 0x78, 0x89, 0x90,
-        0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
-    ])
-    # fmt: on
+    init_vect_str = "начальный вектор1"
+    init_vect_bytearray = str_to_bytearray(init_vect_str)
     keyword_str = "секретный ключ 1234"
     keyword_bytearray = str_to_bytearray(keyword_str)
     page.encrypt_cipher_obj = GOST_34_13_2015_GammaOutputFeedback(
-        key=keyword_bytearray, init_vect=init_vect
+        key=keyword_bytearray, init_vect=init_vect_bytearray
     )
     page.decrypt_cipher_obj = GOST_34_13_2015_GammaOutputFeedback(
-        key=keyword_bytearray, init_vect=init_vect
+        key=keyword_bytearray, init_vect=init_vect_bytearray
     )
     error_t = ft.Text()
     error_dlg = ft.AlertDialog(title=error_t, bgcolor=ft.colors.ON_ERROR)
 
     DEFAULT_MESSAGE = "секретный текст"
 
+    def fill_log_lv(e: ft.ControlEvent | None = None):
+        for v in gost_34_13_2015.log_path.open("r").readlines():
+            log_lv.controls.append(ft.Text(v))
+
     def on_change(e):
         try:
+            init_vect_str = init_vect_tb.value
+            init_vect_bytearray = str_to_bytearray(init_vect_str)
             keyword_str = keyword_tb.value
             keyword_bytearray = str_to_bytearray(keyword_str)
             page.encrypt_cipher_obj = GOST_34_13_2015_GammaOutputFeedback(
-                key=keyword_bytearray, init_vect=init_vect
+                key=keyword_bytearray, init_vect=init_vect_bytearray
             )
             page.decrypt_cipher_obj = GOST_34_13_2015_GammaOutputFeedback(
-                key=keyword_bytearray, init_vect=init_vect
+                key=keyword_bytearray, init_vect=init_vect_bytearray
             )
             encrypted_tb.value = page.encrypt_cipher_obj.encrypt(
                 message_tb.value.encode()
@@ -196,6 +197,7 @@ def block_cipher_controls(
             decrypted_tb.value = page.decrypt_cipher_obj.decrypt(
                 encrypted_tb.value
             ).decode()
+            fill_log_lv(e)
         except Exception as e:
             logger.error(e)
             error_t.value = "\n".join(e.args)
@@ -203,13 +205,10 @@ def block_cipher_controls(
             error_dlg.open = True
         page.update()
 
-    def on_change_params(e):
-        if message_tb.value != DEFAULT_MESSAGE:
-            message_tb.value = ""
-        page.update()
-        on_change(e)
-
-    keyword_tb = ft.TextField(label="key", value=keyword_str, on_change=on_change)
+    init_vect_tb = ft.TextField(
+        label="Initial vector", value=init_vect_str, on_change=on_change
+    )
+    keyword_tb = ft.TextField(label="Key", value=keyword_str, on_change=on_change)
     message_tb = ft.TextField(
         label="Message",
         multiline=True,
@@ -229,6 +228,9 @@ def block_cipher_controls(
         multiline=True,
     )
     decrypted_tb.value = page.decrypt_cipher_obj.decrypt(encrypted_tb.value).decode()
+
+    log_lv = ft.ListView(expand=True, spacing=0)
+    fill_log_lv()
     controls = [
         ft.Row(
             controls=[
@@ -244,19 +246,16 @@ def block_cipher_controls(
                     read_only=True,
                     width=140,
                 ),
-                ft.TextField(
-                    label="Initial vector",
-                    value=page.encrypt_cipher_obj.iv,
-                    read_only=True,
-                    multiline=True,
-                ),
             ],
         ),
         keyword_tb,
+        init_vect_tb,
         ft.Divider(),
         message_tb,
         encrypted_tb,
         decrypted_tb,
+        ft.Divider(),
+        log_lv
     ]
     return controls
 
