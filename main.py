@@ -1,3 +1,5 @@
+import json
+import time
 import typing
 
 import flet as ft
@@ -179,10 +181,11 @@ def block_cipher_controls(
     def fill_log_lv(e: ft.ControlEvent | None = None):
         log_lv.controls.clear()
         data = gost_34_13_2015_log_file_io.readlines()
-        for v in range(0, len(data), 20):
-            log_lv.controls.append(ft.Text("".join(data[v:v + 20])))
+        for v in range(0, len(data), 100):
+            log_lv.controls.append(ft.Text("".join(data[v:v + 100])))
 
     def on_change(e):
+        time.sleep(0.1)
         try:
             init_vect_str = init_vect_tb.value
             init_vect_bytearray = str_to_bytearray(init_vect_str)
@@ -199,11 +202,12 @@ def block_cipher_controls(
             )
             decrypted_tb.value = page.decrypt_cipher_obj.decrypt(
                 encrypted_tb.value
-            ).decode()
+            ).decode(errors="ignore")
             fill_log_lv(e)
         except Exception as e:
             logger.error(e)
-            error_t.value = "\n".join(e.args)
+            print(e.args)
+            error_t.value = json.dumps(e.__dict__, indent=2, default=str)
             page.dialog = error_dlg
             error_dlg.open = True
         page.update()
